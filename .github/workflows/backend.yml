@@ -1,0 +1,35 @@
+name: CI - Backend
+
+on:
+  push:
+    branches:
+      - develop
+      - staging
+      - main
+
+env:
+  APP_NAME: backend
+  IMAGE_TAG: latest
+
+jobs:
+  test-trigger:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        
+      - name: Test
+        run: echo "triggering CD"
+      
+      - name: Trigger CD
+        uses: peter-evans/repository-dispatch@v3
+        with:
+          token: ${{ secrets.CD_TRIGGER_TOKEN }}
+          repository: niitnkumar/helm-repo   # ✅ FIXED
+          event-type: deploy-app
+          client-payload: |
+            {
+              "app": "${{ env.APP_NAME }}",
+              "image_tag": "${{ env.IMAGE_TAG }}"
+            }
